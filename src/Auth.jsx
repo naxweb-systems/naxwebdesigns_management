@@ -12,13 +12,9 @@ export default function Auth({ onAuthenticate }) {
     const stored = sessionStorage.getItem('authenticated');
     if (stored === 'true') {
       setIsAuthenticated(true);
+      onAuthenticate();
     }
   }, []);
-
-  const handleAuthenticated = () => {
-    setIsAuthenticated(true);
-    onAuthenticate();
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,13 +22,19 @@ export default function Auth({ onAuthenticate }) {
     setError('');
 
     try {
-      // Fetch public config to get passcode (will be set from environment)
-      const response = await fetch('/config.json');
-      const config = await response.json();
+      // Get passcode from environment variable
+      const correctPasscode = import.meta.env.VITE_APP_PASSCODE;
       
-      if (passcode === config.APP_PASSCODE) {
+      if (!correctPasscode) {
+        setError('Passcode not configured. Please contact administrator.');
+        setLoading(false);
+        return;
+      }
+      
+      if (passcode === correctPasscode) {
         sessionStorage.setItem('authenticated', 'true');
-        handleAuthenticated();
+        setIsAuthenticated(true);
+        onAuthenticate();
       } else {
         setError('Invalid passcode. Please try again.');
       }
