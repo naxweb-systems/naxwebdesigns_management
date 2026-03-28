@@ -510,8 +510,7 @@ Dear ${client.contactName},
 
 Please find your invoice details below:
 
-${form.lineItems.map(l => `${l.desc}: ${fmt(l.qty * l.price, cur)}`).join("
-")}
+${form.lineItems.map(l => `${l.desc}: ${fmt(l.qty * l.price, cur)}`).join("\n")}
 
 Subtotal: ${fmt(subtotal, cur)}
 Tax: ${fmt(tax, cur)}
