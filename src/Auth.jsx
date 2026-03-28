@@ -12,9 +12,13 @@ export default function Auth({ onAuthenticate }) {
     const stored = sessionStorage.getItem('authenticated');
     if (stored === 'true') {
       setIsAuthenticated(true);
-      onAuthenticate();
     }
-  }, [onAuthenticate]);
+  }, []);
+
+  const handleAuthenticated = () => {
+    setIsAuthenticated(true);
+    onAuthenticate();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,8 +32,7 @@ export default function Auth({ onAuthenticate }) {
       
       if (passcode === config.APP_PASSCODE) {
         sessionStorage.setItem('authenticated', 'true');
-        setIsAuthenticated(true);
-        onAuthenticate();
+        handleAuthenticated();
       } else {
         setError('Invalid passcode. Please try again.');
       }
