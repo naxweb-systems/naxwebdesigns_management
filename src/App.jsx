@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "./lib/supabase";
+import Auth from "./Auth";
 import { 
   Printer, Mail, MessageCircle, Save, Home, Key, Briefcase, Receipt, 
   StickyNote, ChevronRight, Edit3, Phone, Smartphone, Globe, Building2, 
@@ -503,7 +504,25 @@ function InvoiceBuilder({ client, invoice, settings, onSave, onClose, allInvoice
   };
 
   const handleEmail = () => {
-    const body = `Invoice ${form.invoiceNumber}\n\nDear ${client.contactName},\n\nPlease find your invoice details below:\n\n${form.lineItems.map(l => `${l.desc}: ${fmt(l.qty * l.price, cur)}`).join("\n")}\n\nSubtotal: ${fmt(subtotal, cur)}\nTax: ${fmt(tax, cur)}\nTotal: ${fmt(total, cur)}\n\nDue: ${fmtDate(form.dueDate)}\n\n${form.notes}\n\nBest regards,\n${settings.ownerName}`;
+    const body = `Invoice ${form.invoiceNumber}
+
+Dear ${client.contactName},
+
+Please find your invoice details below:
+
+${form.lineItems.map(l => `${l.desc}: ${fmt(l.qty * l.price, cur)}`).join("
+")}
+
+Subtotal: ${fmt(subtotal, cur)}
+Tax: ${fmt(tax, cur)}
+Total: ${fmt(total, cur)}
+
+Due: ${fmtDate(form.dueDate)}
+
+${form.notes}
+
+Best regards,
+${settings.ownerName}`;
     window.open(`mailto:${client.email}?subject=Invoice ${form.invoiceNumber} from ${settings.businessName}&body=${encodeURIComponent(body)}`);
     toast("Email client opened");
   };
@@ -1011,17 +1030,229 @@ function MailTemplates({ client, settings }) {
     welcome: {
       title: "Welcome Mail",
       subject: "Welcome to NAXWEB — Let's Build Something Amazing Together",
-      body: `Dear ${cName},\n\nWelcome aboard — and thank you for choosing NAXWEB.\n\nWe are genuinely excited to have you with us, and we want to start by saying this: you have made a great decision. From this point forward, you have a dedicated digital partner by your side — one that is fully committed to your growth, your vision, and your success online.\n\nA little about who we are:\n\nNAXWEB is a premium Web Development, Digital Design & Automation Studio trusted by businesses across the UAE, India, Australia, Canada, and beyond. We work with startups, growing businesses, and established enterprises — and every single project we take on receives the same level of care, precision, and excellence.\n\nWe don't just build websites. We build digital experiences that perform.\n\nHere is what you can expect from us:\n\n- A transparent, collaborative process from day one\n- Regular updates and clear communication throughout your project\n- Pixel-perfect design combined with solid technical development\n- Timely delivery with no surprises\n- Dedicated support even after your project goes live\n\nOur services include:\nWeb Development · UI/UX Design · eCommerce Solutions · Booking Platforms · API Integrations · SEO Services · Automation Tools · Product & Event Websites · Digital Transformation\n\nWhether you are launching something new or taking your existing business to the next level, we are here to make that journey seamless and impactful.\n\nYour next steps:\n\nOur team will reach out to you shortly to schedule your project discovery call, where we will understand your goals in detail and outline the roadmap ahead. If you have any questions in the meantime, do not hesitate to contact us at any time — we are always available.\n\nOnce again, welcome to the NAXWEB family. We look forward to building something exceptional together.\n\nWarm regards,\n${owner}\nNAXWEB — We Design. We Develop. We Automate.\n🌐 www.NAXWEB.co.in\n📧 ${ownerEmail}\n📱 ${ownerPhone}`
+      body: `Dear ${cName},
+
+Welcome aboard — and thank you for choosing NAXWEB.
+
+We are genuinely excited to have you with us, and we want to start by saying this: you have made a great decision. From this point forward, you have a dedicated digital partner by your side — one that is fully committed to your growth, your vision, and your success online.
+
+A little about who we are:
+
+NAXWEB is a premium Web Development, Digital Design & Automation Studio trusted by businesses across the UAE, India, Australia, Canada, and beyond. We work with startups, growing businesses, and established enterprises — and every single project we take on receives the same level of care, precision, and excellence.
+
+We don't just build websites. We build digital experiences that perform.
+
+Here is what you can expect from us:
+
+- A transparent, collaborative process from day one
+- Regular updates and clear communication throughout your project
+- Pixel-perfect design combined with solid technical development
+- Timely delivery with no surprises
+- Dedicated support even after your project goes live
+
+Our services include:
+Web Development · UI/UX Design · eCommerce Solutions · Booking Platforms · API Integrations · SEO Services · Automation Tools · Product & Event Websites · Digital Transformation
+
+Whether you are launching something new or taking your existing business to the next level, we are here to make that journey seamless and impactful.
+
+Your next steps:
+
+Our team will reach out to you shortly to schedule your project discovery call, where we will understand your goals in detail and outline the roadmap ahead. If you have any questions in the meantime, do not hesitate to contact us at any time — we are always available.
+
+Once again, welcome to the NAXWEB family. We look forward to building something exceptional together.
+
+Warm regards,
+${owner}
+NAXWEB — We Design. We Develop. We Automate.
+🌐 www.NAXWEB.co.in
+📧 ${ownerEmail}
+📱 ${ownerPhone}`
     },
     contract: {
       title: "Service Contract",
       subject: `NAXWEB — Service Agreement for ${cCompany}`,
-      body: `SERVICE AGREEMENT\n\nNAXWEB | NAXWEB.co.in\nPremium Web Development, Digital Design & Automation Studio\n\n---\n\nAGREEMENT BETWEEN:\n\nService Provider:\nNAXWEB (NAXWEB.co.in)\n${ownerAddress}\n${ownerEmail}\n${ownerPhone}\n\nClient:\n${cCompany}\n${cName}\n${client.email || "[Client Email]"}\n${client.phone || "[Client Contact Number]"}\n\nDate of Agreement: ${new Date().toLocaleDateString("en-GB")}\nProject Name: Design & Development Project\n\n---\n\n1. SCOPE OF SERVICES\n\nNAXWEB agrees to provide the following services to the Client as part of this engagement:\n\n${servicesList}\n\nA detailed breakdown of deliverables, milestones, and specifications for the above services will be shared separately in the Project Scope Document, which forms an integral part of this agreement.\n\n---\n\n2. PROJECT TIMELINE\n\n- Estimated Start Date: [DD/MM/YYYY]\n- Estimated Completion Date: [DD/MM/YYYY]\n- Timelines are subject to timely provision of required content, assets, feedback, and approvals by the Client.\n- NAXWEB will communicate any delays proactively and in advance.\n\n---\n\n3. PAYMENT TERMS\n\n- Total Project Value: [Amount]\n- Advance Payment: 50% due before work commences\n- Final Payment: remaining 50% due upon project completion before final delivery\n- All payments are non-refundable once the respective phase of work has commenced.\n- Invoices are due within 7 days of issuance.\n\n---\n\n4. TOOLS, TECHNOLOGIES & AI-ASSISTED WORKFLOWS\n\nNAXWEB utilises industry-leading technologies, premium software platforms, and advanced AI-powered tools as part of its development and design workflow. These include but are not limited to modern development frameworks, UI/UX design software, SEO tools, automation platforms, and AI-assisted productivity and code tools.\n\nThe use of such tools is aimed at delivering superior quality, faster turnaround, and more refined outputs for the Client.\n\nPlease note: While NAXWEB applies the highest standards of professional diligence and quality control throughout every project, the use of advanced tools — including AI-assisted technologies — does not guarantee the complete absence of errors, bugs, or imperfections. All deliverables are subject to a review and testing phase, and NAXWEB commits to addressing reported issues within the agreed support period. However, NAXWEB does not warrant that deliverables will be entirely error-free under all conditions or environments beyond those tested.\n\n---\n\n5. CLIENT RESPONSIBILITIES\n\nThe Client agrees to:\n- Provide all required content, images, branding assets, and information in a timely manner\n- Provide prompt feedback and approvals at each project milestone\n- Ensure a designated point of contact is available throughout the project duration\n- Inform NAXWEB of any changes to requirements as early as possible, noting that scope changes may affect timelines and pricing\n\n---\n\n6. REVISIONS & CHANGE REQUESTS\n\n- This agreement includes 2 rounds of revisions as part of the agreed scope\n- Additional revisions or scope changes beyond the agreed limit will be quoted separately\n- Significant changes to the original brief after work has commenced may require a revised agreement\n\n---\n\n7. INTELLECTUAL PROPERTY & OWNERSHIP\n\n- Upon receipt of full and final payment, the Client will hold full ownership of all custom deliverables created under this agreement\n- NAXWEB retains the right to showcase completed work in its portfolio and marketing materials unless the Client requests otherwise in writing\n- Any third-party tools, plugins, themes, or licensed assets used remain subject to their respective license terms\n\n---\n\n8. CONFIDENTIALITY\n\nBoth parties agree to keep all shared business information, credentials, strategic details, and project specifics strictly confidential. Neither party shall disclose such information to any third party without prior written consent from the other.\n\n---\n\n9. SUPPORT & MAINTENANCE\n\n- Post-delivery support is included for a period of 30 days from the date of final delivery\n- During this period, NAXWEB will address bugs or issues directly related to the delivered work at no additional charge\n- Support beyond this period, and ongoing maintenance, will be covered under a separate maintenance agreement\n\n---\n\n10. LIMITATION OF LIABILITY\n\nNAXWEB's total liability under this agreement shall not exceed the total amount paid by the Client for the specific project. NAXWEB shall not be held liable for indirect, incidental, or consequential damages arising from the use of delivered services or any third-party platform, tool, or integration involved in the project.\n\n---\n\n11. TERMINATION\n\nEither party may terminate this agreement with 15 days written notice. In the event of termination:\n- The Client will be invoiced for all work completed up to the date of termination\n- Any advance payments made are non-refundable for work already in progress\n- NAXWEB will provide all completed work files to the Client upon receipt of outstanding payments\n\n---\n\n12. GOVERNING LAW\n\nThis agreement shall be governed by the laws of applicable jurisdiction. Any disputes shall first be attempted to be resolved through mutual discussion. If unresolved, disputes shall be referred to the appropriate legal jurisdiction.\n\n---\n\nAGREEMENT & SIGNATURES\n\nBy signing below, both parties confirm that they have read, understood, and agree to the terms outlined in this Service Agreement.\n\nService Provider — NAXWEB\nName: ${owner}\nSignature: ___________________________\nDate: ${new Date().toLocaleDateString("en-GB")}\n\nClient\nName: ${cName}\nCompany: ${cCompany}\nSignature: ___________________________\nDate: ___________________________\n\n---\nNAXWEB | NAXWEB.co.in | We Design. We Develop. We Automate.`
+      body: `SERVICE AGREEMENT
+
+NAXWEB | NAXWEB.co.in
+Premium Web Development, Digital Design & Automation Studio
+
+---
+
+AGREEMENT BETWEEN:
+
+Service Provider:
+NAXWEB (NAXWEB.co.in)
+${ownerAddress}
+${ownerEmail}
+${ownerPhone}
+
+Client:
+${cCompany}
+${cName}
+${client.email || "[Client Email]"}
+${client.phone || "[Client Contact Number]"}
+
+Date of Agreement: ${new Date().toLocaleDateString("en-GB")}
+Project Name: Design & Development Project
+
+---
+
+1. SCOPE OF SERVICES
+
+NAXWEB agrees to provide the following services to the Client as part of this engagement:
+
+${servicesList}
+
+A detailed breakdown of deliverables, milestones, and specifications for the above services will be shared separately in the Project Scope Document, which forms an integral part of this agreement.
+
+---
+
+2. PROJECT TIMELINE
+
+- Estimated Start Date: [DD/MM/YYYY]
+- Estimated Completion Date: [DD/MM/YYYY]
+- Timelines are subject to timely provision of required content, assets, feedback, and approvals by the Client.
+- NAXWEB will communicate any delays proactively and in advance.
+
+---
+
+3. PAYMENT TERMS
+
+- Total Project Value: [Amount]
+- Advance Payment: 50% due before work commences
+- Final Payment: remaining 50% due upon project completion before final delivery
+- All payments are non-refundable once the respective phase of work has commenced.
+- Invoices are due within 7 days of issuance.
+
+---
+
+4. TOOLS, TECHNOLOGIES & AI-ASSISTED WORKFLOWS
+
+NAXWEB utilises industry-leading technologies, premium software platforms, and advanced AI-powered tools as part of its development and design workflow. These include but are not limited to modern development frameworks, UI/UX design software, SEO tools, automation platforms, and AI-assisted productivity and code tools.
+
+The use of such tools is aimed at delivering superior quality, faster turnaround, and more refined outputs for the Client.
+
+Please note: While NAXWEB applies the highest standards of professional diligence and quality control throughout every project, the use of advanced tools — including AI-assisted technologies — does not guarantee the complete absence of errors, bugs, or imperfections. All deliverables are subject to a review and testing phase, and NAXWEB commits to addressing reported issues within the agreed support period. However, NAXWEB does not warrant that deliverables will be entirely error-free under all conditions or environments beyond those tested.
+
+---
+
+5. CLIENT RESPONSIBILITIES
+
+The Client agrees to:
+- Provide all required content, images, branding assets, and information in a timely manner
+- Provide prompt feedback and approvals at each project milestone
+- Ensure a designated point of contact is available throughout the project duration
+- Inform NAXWEB of any changes to requirements as early as possible, noting that scope changes may affect timelines and pricing
+
+---
+
+6. REVISIONS & CHANGE REQUESTS
+
+- This agreement includes 2 rounds of revisions as part of the agreed scope
+- Additional revisions or scope changes beyond the agreed limit will be quoted separately
+- Significant changes to the original brief after work has commenced may require a revised agreement
+
+---
+
+7. INTELLECTUAL PROPERTY & OWNERSHIP
+
+- Upon receipt of full and final payment, the Client will hold full ownership of all custom deliverables created under this agreement
+- NAXWEB retains the right to showcase completed work in its portfolio and marketing materials unless the Client requests otherwise in writing
+- Any third-party tools, plugins, themes, or licensed assets used remain subject to their respective license terms
+
+---
+
+8. CONFIDENTIALITY
+
+Both parties agree to keep all shared business information, credentials, strategic details, and project specifics strictly confidential. Neither party shall disclose such information to any third party without prior written consent from the other.
+
+---
+
+9. SUPPORT & MAINTENANCE
+
+- Post-delivery support is included for a period of 30 days from the date of final delivery
+- During this period, NAXWEB will address bugs or issues directly related to the delivered work at no additional charge
+- Support beyond this period, and ongoing maintenance, will be covered under a separate maintenance agreement
+
+---
+
+10. LIMITATION OF LIABILITY
+
+NAXWEB's total liability under this agreement shall not exceed the total amount paid by the Client for the specific project. NAXWEB shall not be held liable for indirect, incidental, or consequential damages arising from the use of delivered services or any third-party platform, tool, or integration involved in the project.
+
+---
+
+11. TERMINATION
+
+Either party may terminate this agreement with 15 days written notice. In the event of termination:
+- The Client will be invoiced for all work completed up to the date of termination
+- Any advance payments made are non-refundable for work already in progress
+- NAXWEB will provide all completed work files to the Client upon receipt of outstanding payments
+
+---
+
+12. GOVERNING LAW
+
+This agreement shall be governed by the laws of applicable jurisdiction. Any disputes shall first be attempted to be resolved through mutual discussion. If unresolved, disputes shall be referred to the appropriate legal jurisdiction.
+
+---
+
+AGREEMENT & SIGNATURES
+
+By signing below, both parties confirm that they have read, understood, and agree to the terms outlined in this Service Agreement.
+
+Service Provider — NAXWEB
+Name: ${owner}
+Signature: ___________________________
+Date: ${new Date().toLocaleDateString("en-GB")}
+
+Client
+Name: ${cName}
+Company: ${cCompany}
+Signature: ___________________________
+Date: ___________________________
+
+---
+NAXWEB | NAXWEB.co.in | We Design. We Develop. We Automate.`
     },
     thankyou: {
       title: "Thank You Mail",
       subject: "Thank You from NAXWEB — It Was a Pleasure Working With You",
-      body: `Dear ${cName},\n\nOn behalf of the entire NAXWEB team, I want to take a moment to sincerely thank you for trusting us with your project.\n\nIt has been a genuine pleasure working with you. From the very first conversation to the final delivery, your collaboration, clear communication, and trust in our process made this a rewarding experience for our entire team.\n\nWe hope what we have built together truly reflects your vision and sets a strong foundation for your growth online. Seeing a project come to life — and knowing it will make a real difference for your business — is exactly why we do what we do.\n\nA quick reminder of what has been delivered:\n\n${servicesList}\n\nYour post-delivery support period is active until: [30 Days from today]\nDuring this time, if you notice anything that needs attention, please reach out and we will take care of it promptly.\n\nLooking ahead:\n\nDigital success is an ongoing journey, and NAXWEB is here for every step of it. Whether it is future updates, new features, SEO campaigns, automation, or an entirely new project — we are just one message away.\n\nWe would truly appreciate it if you could:\n- Leave us a short review or testimonial — it means the world to a growing studio like ours\n- Refer us to any business in your network that could benefit from our services\n\nEvery referral and every kind word helps us continue doing what we love.\n\nThank you once again, ${cName}. It was an honour working with you, and we look forward to the opportunity to work together again in the future.\n\nWarm regards,\n${owner}\nNAXWEB — We Design. We Develop. We Automate.\n🌐 www.NAXWEB.co.in\n📧 ${ownerEmail}\n📱 ${ownerPhone}\n\n© NAXWEB | NAXWEB.co.in | Premium Web Development, Design & Automation`
+      body: `Dear ${cName},
+
+On behalf of the entire NAXWEB team, I want to take a moment to sincerely thank you for trusting us with your project.
+
+It has been a genuine pleasure working with you. From the very first conversation to the final delivery, your collaboration, clear communication, and trust in our process made this a rewarding experience for our entire team.
+
+We hope what we have built together truly reflects your vision and sets a strong foundation for your growth online. Seeing a project come to life — and knowing it will make a real difference for your business — is exactly why we do what we do.
+
+A quick reminder of what has been delivered:
+
+${servicesList}
+
+Your post-delivery support period is active until: [30 Days from today]
+During this time, if you notice anything that needs attention, please reach out and we will take care of it promptly.
+
+Looking ahead:
+
+Digital success is an ongoing journey, and NAXWEB is here for every step of it. Whether it is future updates, new features, SEO campaigns, automation, or an entirely new project — we are just one message away.
+
+We would truly appreciate it if you could:
+- Leave us a short review or testimonial — it means the world to a growing studio like ours
+- Refer us to any business in your network that could benefit from our services
+
+Every referral and every kind word helps us continue doing what we love.
+
+Thank you once again, ${cName}. It was an honour working with you, and we look forward to the opportunity to work together again in the future.
+
+Warm regards,
+${owner}
+NAXWEB — We Design. We Develop. We Automate.
+🌐 www.NAXWEB.co.in
+📧 ${ownerEmail}
+📱 ${ownerPhone}
+
+© NAXWEB | NAXWEB.co.in | Premium Web Development, Design & Automation`
     }
   };
 
@@ -1556,6 +1787,7 @@ function SettingsPage({ settings, onSave, clients, onImport }) {
 // MAIN APP
 // ═══════════════════════════════════════════════════════════════
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [clients, setClients] = useState([]);
   const [settings, setSettings] = useState(INITIAL_SETTINGS);
   const [loading, setLoading] = useState(true);
@@ -1563,6 +1795,11 @@ export default function App() {
   const [selectedClient, setSelectedClient] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showNewClient, setShowNewClient] = useState(false);
+
+  // If not authenticated, show auth screen
+  if (!isAuthenticated) {
+    return <Auth onAuthenticate={() => setIsAuthenticated(true)} />;
+  }
 
   useEffect(() => {
     fetchData();
